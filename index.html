@@ -653,7 +653,7 @@ function addWrong(q,myAnswer,reason){
   const ex=state.wrongBook.find(x=>x.qid===q.id);
   if(ex){ ex.wrongCount++; ex.lastWrongDate=todayStr(); ex.myAnswer=myAnswer; ex.wrongReason=reason; ex.correctStreak=0; ex.status='active'; ex.nextReviewDate=addDaysStr(todayStr(),1); }
   else{
-    state.wrongBook.push({qid:q.id,module:q.module,topic:q.topic,diff:q.diff,stem:q.stem,opts:q.opts,ans:q.ans,analysis:q.analysis,
+    state.wrongBook.push({qid:q.id,module:q.mod,topic:q.topic,diff:q.diff,stem:q.stem,opts:q.opts,ans:q.ans,analysis:q.analysis,
       myAnswer, wrongReason:reason, wrongCount:1, lastWrongDate:todayStr(), correctStreak:0, status:'active', nextReviewDate:addDaysStr(todayStr(),1)});
   }
   save();
@@ -942,7 +942,7 @@ function renderPQuestion(){
   const q=P.qs[P.idx]; if(!q){ renderPResult(); return; }
   P.answered=false; P.selected=-1;
   const secs=({basic:60,mid:50,high:40})[q.diff]||50;
-  $('view-practice').innerHTML=`<div class="card"><div class="row"><span class="badge">第 ${P.idx+1}/${P.qs.length} 题</span><span class="badge">${MODS[q.module].icon} ${MODS[q.module].name} · ${DIFFS[q.diff]}</span></div>
+  $('view-practice').innerHTML=`<div class="card"><div class="row"><span class="badge">第 ${P.idx+1}/${P.qs.length} 题</span><span class="badge">${MODS[q.mod].icon} ${MODS[q.mod].name} · ${DIFFS[q.diff]}</span></div>
     <div class="row" style="margin-top:8px"><span class="chip">考点：${esc(q.topic)}</span></div>
     <div class="timer-big timer" id="q-timer">${secs}</div></div>
     <div class="card"><div style="font-size:16px;line-height:1.8;white-space:pre-wrap">${esc(q.stem)}</div></div>
@@ -959,8 +959,8 @@ function answerPractice(i,timeUp){
   const q=P.qs[P.idx]; P.selected=i;
   const ok=(i===q.ans);
   const dur=({basic:60,mid:50,high:40})[q.diff]-(timeUp?0:qRemain);
-  if(ok){ P.correct++; recordAnswer(q.module,q.topic,true,dur); }
-  else { P.wrong++; recordAnswer(q.module,q.topic,false,dur); }
+  if(ok){ P.correct++; recordAnswer(q.mod,q.topic,true,dur); }
+  else { P.wrong++; recordAnswer(q.mod,q.topic,false,dur); }
   // 渲染选项状态
   q.opts.forEach((_,idx)=>{ const el=$('opt-'+idx); if(!el) return; el.classList.add('dim'); if(idx===q.ans) el.classList.add('correct'); else if(idx===i) el.classList.add('wrong'); });
   let ana=renderAnalysis(q,i);
@@ -988,7 +988,7 @@ function setWrongReason(qidKey,reason){
 function nextPractice(){ P.idx++; if(P.idx>=P.qs.length){ renderPResult(); } else { renderPQuestion(); } }
 function variantPractice(){
   const q=P.qs[P.idx];
-  const pool=(q.module==='changshi'?BANK[q.module].concat(state.customQuestions):BANK[q.module]).filter(x=>x.topic===q.topic && x!==q);
+  const pool=(q.mod==='changshi'?BANK[q.mod].concat(state.customQuestions):BANK[q.mod]).filter(x=>x.topic===q.topic && x!==q);
   if(pool.length===0){ toast('该考点暂无更多变式题'); return; }
   const nq=shuffle(pool)[0];
   P.qs.splice(P.idx+1,0,nq);
